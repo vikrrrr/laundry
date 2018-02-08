@@ -21,7 +21,7 @@ function ENT:Initialize()
 
 	self:SetUseType(SIMPLE_USE)
  
-    local phys = self:GetPhysicsObject()
+  local phys = self:GetPhysicsObject()
 	if (phys:IsValid()) then
 		phys:Wake()
 	end
