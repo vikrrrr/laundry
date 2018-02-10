@@ -1,7 +1,7 @@
 if SERVER then
-	AddCSLuaFile("config.lua")
+	AddCSLuaFile("vikrlaundry_config.lua")
 
-	include("config.lua")
+	include("vikrlaundry_config.lua")
 elseif CLIENT then
-	include("config.lua")
+	include("vikrlaundry_config.lua")
 end

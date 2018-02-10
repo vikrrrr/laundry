@@ -1,5 +1,5 @@
 include("shared.lua")
-include("autorun/config.lua")
+include("autorun/vikrlaundry_config.lua")
 
 function ENT:Draw()
   self:DrawModel()
