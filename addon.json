@@ -3,9 +3,7 @@
   "type": "tool",
   "tags": ["fun", "roleplay"],
   "ignore": [
-    "*.psd",
-    "*.vcproj",
-    "*.svn*",
+    "*addon.jpg",
     "*.git*",
     "LICENSE"
   ]
