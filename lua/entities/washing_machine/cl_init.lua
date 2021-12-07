@@ -18,13 +18,3 @@ function ENT:Draw()
         draw.RoundedBox(0, x - w / 2 + 1, y - h / 2 + 1, w, h, self:GetWashing() and colGreen or colRed)
     cam.End3D2D()
 end
-
-function ENT:Think()
-    if not self.ClothModel then return end
-
-    self.ClothModel:SetPos(self:LocalToWorld(self:OBBCenter()))
-
-    if not self:GetWashing() then
-        self.ClothModel:Remove()
-    end
-end
