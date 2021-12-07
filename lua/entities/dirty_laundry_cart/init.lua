@@ -3,16 +3,6 @@ AddCSLuaFile("shared.lua")
  
 include("shared.lua")
 
-function ENT:SpawnFunction(ply, tr, cn)
-	local ang = ply:GetAngles()
-	local ent = ents.Create(cn)
-	ent:SetPos(tr.HitPos + tr.HitNormal + Vector(0,0,40))
-	ent:SetAngles(Angle(0, ang.y, 0) - Angle(0, 90, 0))
-	ent:Spawn()
-
-	return ent
-end
-
 function ENT:Initialize()
 	self:SetModel("models/props_wasteland/laundry_basket001.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
