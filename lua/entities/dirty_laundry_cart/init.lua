@@ -32,20 +32,11 @@ function ENT:Use(act, cal)
 	if not cloth:IsValid() then return end
 	cloth:SetPos(pos + (ang:Up() * 30))
 	cloth:SetAngles(self:GetAngles())
-	if math.random(1, 4) == 4 then
-		cloth:SetClothType(2)
-	else
-		cloth:SetClothType(1)
-	end
+	cloth:SetClothType(math.random(1, 4) == 4 and 2 or 1)
 	cloth:SetClean(false)
 	cloth:Spawn()
 
 	self:SetClothesNumber(self:GetClothesNumber() - 1)
-end
-
-function ENT:Think()
-	self:NextThink(CurTime())
-	return true
 end
 
 function ENT:OnRemove()
