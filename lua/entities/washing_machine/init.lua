@@ -1,6 +1,6 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
- 
+
 include("shared.lua")
 
 function ENT:Initialize()
@@ -8,32 +8,20 @@ function ENT:Initialize()
     self:PhysicsInit(SOLID_VPHYSICS)
     self:SetMoveType(MOVETYPE_VPHYSICS)
     self:SetSolid(SOLID_VPHYSICS)
-    
+
     local phys = self:GetPhysicsObject()
     if (phys:IsValid()) then
         phys:Wake()
     end
 end
 
-function ENT:Think()
-    local pos = self:LocalToWorld(self:OBBCenter())
-    local ang = self:GetAngles()
-    ang:RotateAroundAxis(ang:Up(), 90)
-    ang:RotateAroundAxis(ang:Forward(), 90)
-
-    for _, ent in pairs(ents.FindInSphere(pos + (ang:Up() * 20) - (ang:Right() * 9), 20)) do
-        if ent:GetClass() == "cloth" and not self:GetWashing() then
-        if not ent:GetClean() then
-            self:SetClothType(ent:GetClothType())
-            self:SetWashing(true)
-            self:SetWashState(LaundryConfig.WashTime)
-            ent:Remove()
-        end
-        end
+function ENT:StartTouch(ent)
+    if not self:GetWashing() and ent:GetClass() == "cloth" and not ent:GetClean() then
+        self:SetClothType(ent:GetClothType())
+        self:SetWashing(true)
+        self:SetWashState(LaundryConfig.WashTime)
+        ent:Remove()
     end
-
-    self:NextThink(CurTime())
-    return true
 end
 
 function ENT:OnWash(ent, name, ov, nv)
