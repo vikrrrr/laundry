@@ -20,7 +20,12 @@ end
 function ENT:Use(act, cal)
     local numCloth = #self.ClothTable
 
-	if not self.ClothTable or numCloth < 1 or not cal:IsValid() then return end
+	if not self.ClothTable or numCloth < 1 then return end
+
+    if (LaundryConfig.BlackOrWhiteList and LaundryConfig.Teams[team.GetName(cal:Team())]) or (not LaundryConfig.BlackOrWhiteList and not LaundryConfig.Teams[team.GetName(cal:Team())]) then
+        DarkRP.notify(cal, 1, 5, LaundryConfig.PhraseCantInteract)
+        return
+    end
 
     local reward = numCloth * LaundryConfig.MoneyPerCloth
 

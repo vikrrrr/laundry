@@ -23,6 +23,11 @@ function ENT:Initialize()
 end
 
 function ENT:Use(act, cal)
+    if (LaundryConfig.BlackOrWhiteList and LaundryConfig.Teams[team.GetName(cal:Team())]) or (not LaundryConfig.BlackOrWhiteList and not LaundryConfig.Teams[team.GetName(cal:Team())]) then
+        DarkRP.notify(cal, 1, 5, LaundryConfig.PhraseCantInteract)
+        return
+    end
+    
 	if self:GetClothesNumber() <= 0 then return end
 
 	local pos = self:LocalToWorld(self:OBBCenter())

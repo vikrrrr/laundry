@@ -23,3 +23,16 @@ LaundryConfig.PhraseDirtyClothes = "%d dirty clothes"
 -- <money> = Money received, <clothes> = clothes washed (default: "You received <money> for washing <clothes> clothes")
 LaundryConfig.PhraseNotifyText = "You received %s for washing %d clothes"
 -- Example : "You got <money> for <clothes> clothes" will show "You got 60$ for 6 clothes"
+
+LaundryConfig.PhraseCantInteract = "You cannot interact with this"
+
+-- true = Blacklist teams, false = Whitelist teams (default: true)
+LaundryConfig.BlackOrWhiteList = true
+-- Example : If the value is true, all teams in the configuration below will be blacklisted of the addon
+
+-- Name of white/blacklisted teams
+LaundryConfig.Teams = {
+    ["Guard"] = true,
+    ["Chief Guard"] = true,
+    ["Director"] = true
+}
