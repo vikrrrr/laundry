@@ -9,8 +9,8 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = false
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Float", 0, "WashState")
-	self:NetworkVar("Float", 1, "ClothType")
+	self:NetworkVar("Int", 0, "WashState")
+	self:NetworkVar("Int", 1, "ClothType")
 	self:NetworkVar("Bool", 2, "Washing")
 
 	if SERVER then

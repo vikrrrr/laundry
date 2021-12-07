@@ -9,5 +9,5 @@ ENT.Spawnable = true
 ENT.AdminSpawnable = false
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Float", 0, "ClothesNumber")
+	self:NetworkVar("Int", 0, "ClothesNumber")
 end
