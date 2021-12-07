@@ -11,23 +11,22 @@ function ENT:Initialize()
 
 	self:SetUseType(SIMPLE_USE)
  
-  local phys = self:GetPhysicsObject()
+    local phys = self:GetPhysicsObject()
 	if (phys:IsValid()) then
 		phys:Wake()
 	end
 end
 
 function ENT:Use(act, cal)
-	if not self.ClothTable then return end
-	if not (#self.ClothTable > 0) then return end
-	if not cal:IsValid() then return end
+    local numCloth = #self.ClothTable
 
-	cal:addMoney(#self.ClothTable * LaundryConfig.MoneyPerCloth)
+	if not self.ClothTable or numCloth < 1 or not cal:IsValid() then return end
 
-	local phrase = string.gsub(LaundryConfig.PhraseNotifyText, "<clothes>", tostring(#self.ClothTable))
-	phrase = string.gsub(phrase, "<money>", tostring(#self.ClothTable * LaundryConfig.MoneyPerCloth) .. GAMEMODE.Config.currency)
+    local reward = numCloth * LaundryConfig.MoneyPerCloth
 
-	DarkRP.notify(cal, 0, 7, phrase)
+	cal:addMoney(reward)
+
+	DarkRP.notify(cal, 0, 7, string.format(LaundryConfig.PhraseNotifyText, DarkRP.formatMoney(reward), numCloth))
 	
 	for _, ent in pairs(self.ClothTable) do
 		ent:Remove()
@@ -35,33 +34,18 @@ function ENT:Use(act, cal)
 end
 
 function ENT:Think()
-	local pos = self:LocalToWorld(self:OBBCenter())
 	local ang = self:GetAngles()
-	local entnum = 0
-	self.ClothTable = { }
 
-	for _, ent in pairs(ents.FindInSphere(pos + (ang:Forward() * 20), 20)) do
-		if ent:GetClass() == "cloth" and not table.HasValue(self.ClothTable, ent) then
-			if ent:GetClean() then
-				table.insert(self.ClothTable, ent)
-			end
+	self.ClothTable = {}
+
+	for _, ent in pairs(ents.FindInSphere(self:LocalToWorld(self:OBBCenter()) + (ang:Forward() * 20), 20)) do
+		if ent:GetClass() == "cloth" and ent:GetClean() and not table.HasValue(self.ClothTable, ent) then
+			table.insert(self.ClothTable, ent)
 		end
 	end
 
-	for _, ent in pairs(ents.FindInSphere(pos - (ang:Forward() * 20), 20)) do
-		if ent:GetClass() == "cloth" then
-			if ent:GetClean() and not table.HasValue(self.ClothTable, ent) then
-				table.insert(self.ClothTable, ent)
-			end
-		end
-	end
+	self:SetClothesNumber(#self.ClothTable)
 
-	for _, ent in pairs(self.ClothTable) do
-		entnum = entnum + 1
-	end
-
-	self:SetClothesNumber(entnum)
-
-	self:NextThink(CurTime() + 0.1)
+	self:NextThink(CurTime() + 1)
 	return true
 end
