@@ -33,17 +33,17 @@ function ENT:Use(act, cal)
 
 	DarkRP.notify(cal, 0, 7, string.format(LaundryConfig.PhraseNotifyText, DarkRP.formatMoney(reward), numCloth))
 	
-	for _, ent in pairs(self.ClothTable) do
+	for index, ent in pairs(self.ClothTable) do
+        self.ClothTable[index] = nil
 		ent:Remove()
 	end
 end
 
 function ENT:Think()
-	local ang = self:GetAngles()
-
 	self.ClothTable = {}
+    local x, y = self:GetModelBounds()
 
-	for _, ent in pairs(ents.FindInSphere(self:LocalToWorld(self:OBBCenter()) + (ang:Forward() * 20), 20)) do
+	for _, ent in pairs(ents.FindInBox(self:LocalToWorld(x + Vector(10, 0, 10)), self:LocalToWorld(y - Vector(10, 0, 0)))) do
 		if ent:GetClass() == "cloth" and ent:GetClean() and not table.HasValue(self.ClothTable, ent) then
 			table.insert(self.ClothTable, ent)
 		end
