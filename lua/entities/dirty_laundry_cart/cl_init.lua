@@ -1,14 +1,16 @@
 include("shared.lua")
 
+local colWhite = Color(255, 255, 255)
+local superAngle = Angle(0, 0, 90)
+
 function ENT:Draw()
-  self:DrawModel()
+    self:DrawModel()
 
-  local pos = self:LocalToWorld(self:OBBCenter())
-  local ang = self:GetAngles()
+	if self:GetPos():DistToSqr(LocalPlayer():GetPos()) > 500 ^ 2 then return end
 
-  local phrase = string.gsub(LaundryConfig.PhraseDirtyClothes, "<clothes>", self:GetClothesNumber())
+    local ang = self:GetAngles()
 
-  cam.Start3D2D(pos + (ang:Up() * 5) + (ang:Right() * 25), ang + Angle(0, 0, 90), 0.25)
-    draw.SimpleText(tostring(phrase), "DermaLarge", 0, 0, Color(255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-  cam.End3D2D()
+    cam.Start3D2D(self:LocalToWorld(self:OBBCenter()) + (ang:Up() * 5) + (ang:Right() * 25), ang + superAngle, 0.25)
+        draw.SimpleText(string.format(LaundryConfig.PhraseDirtyClothes, self:GetClothesNumber()), "DermaLarge", 0, 0, colWhite, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    cam.End3D2D()
 end

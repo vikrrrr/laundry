@@ -3,16 +3,6 @@ AddCSLuaFile("shared.lua")
  
 include("shared.lua")
 
-function ENT:SpawnFunction(ply, tr, cn)
-	local ang = ply:GetAngles()
-	local ent = ents.Create(cn)
-	ent:SetPos(tr.HitPos + tr.HitNormal + Vector(0,0,60))
-	ent:SetAngles(Angle(0, ang.y, 0) - Angle(0, 90, 0))
-	ent:Spawn()
-
-	return ent
-end
-
 function ENT:Initialize()
 	self:SetModel("models/props_wasteland/laundry_cart001.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -21,57 +11,46 @@ function ENT:Initialize()
 
 	self:SetUseType(SIMPLE_USE)
  
-  local phys = self:GetPhysicsObject()
+    local phys = self:GetPhysicsObject()
 	if (phys:IsValid()) then
 		phys:Wake()
 	end
 end
 
 function ENT:Use(act, cal)
-	if not self.ClothTable then return end
-	if not (#self.ClothTable > 0) then return end
-	if not cal:IsValid() then return end
+    local numCloth = #self.ClothTable
 
-	cal:addMoney(#self.ClothTable * LaundryConfig.MoneyPerCloth)
+	if not self.ClothTable or numCloth < 1 then return end
 
-	local phrase = string.gsub(LaundryConfig.PhraseNotifyText, "<clothes>", tostring(#self.ClothTable))
-	phrase = string.gsub(phrase, "<money>", tostring(#self.ClothTable * LaundryConfig.MoneyPerCloth) .. GAMEMODE.Config.currency)
+    if (LaundryConfig.BlackOrWhiteList and LaundryConfig.Teams[team.GetName(cal:Team())]) or (not LaundryConfig.BlackOrWhiteList and not LaundryConfig.Teams[team.GetName(cal:Team())]) then
+        DarkRP.notify(cal, 1, 5, LaundryConfig.PhraseCantInteract)
+        return
+    end
 
-	DarkRP.notify(cal, 0, 7, phrase)
+    local reward = numCloth * LaundryConfig.MoneyPerCloth
+
+	cal:addMoney(reward)
+
+	DarkRP.notify(cal, 0, 7, string.format(LaundryConfig.PhraseNotifyText, DarkRP.formatMoney(reward), numCloth))
 	
-	for _, ent in pairs(self.ClothTable) do
+	for index, ent in pairs(self.ClothTable) do
+        self.ClothTable[index] = nil
 		ent:Remove()
 	end
 end
 
 function ENT:Think()
-	local pos = self:LocalToWorld(self:OBBCenter())
-	local ang = self:GetAngles()
-	local entnum = 0
-	self.ClothTable = { }
+	self.ClothTable = {}
+    local x, y = self:GetModelBounds()
 
-	for _, ent in pairs(ents.FindInSphere(pos + (ang:Forward() * 20), 20)) do
-		if ent:GetClass() == "cloth" and not table.HasValue(self.ClothTable, ent) then
-			if ent:GetClean() then
-				table.insert(self.ClothTable, ent)
-			end
+	for _, ent in pairs(ents.FindInBox(self:LocalToWorld(x + Vector(10, 0, 10)), self:LocalToWorld(y - Vector(10, 0, 0)))) do
+		if ent:GetClass() == "cloth" and ent:GetClean() and not table.HasValue(self.ClothTable, ent) then
+			table.insert(self.ClothTable, ent)
 		end
 	end
 
-	for _, ent in pairs(ents.FindInSphere(pos - (ang:Forward() * 20), 20)) do
-		if ent:GetClass() == "cloth" then
-			if ent:GetClean() and not table.HasValue(self.ClothTable, ent) then
-				table.insert(self.ClothTable, ent)
-			end
-		end
-	end
+	self:SetClothesNumber(#self.ClothTable)
 
-	for _, ent in pairs(self.ClothTable) do
-		entnum = entnum + 1
-	end
-
-	self:SetClothesNumber(entnum)
-
-	self:NextThink(CurTime() + 0.1)
+	self:NextThink(CurTime() + 1)
 	return true
 end

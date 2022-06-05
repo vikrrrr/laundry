@@ -3,16 +3,6 @@ AddCSLuaFile("shared.lua")
  
 include("shared.lua")
 
-function ENT:SpawnFunction(ply, tr, cn)
-	local ang = ply:GetAngles()
-	local ent = ents.Create(cn)
-	ent:SetPos(tr.HitPos + tr.HitNormal + Vector(0,0,40))
-	ent:SetAngles(Angle(0, ang.y, 0) - Angle(0, 90, 0))
-	ent:Spawn()
-
-	return ent
-end
-
 function ENT:Initialize()
 	self:SetModel("models/props_wasteland/laundry_basket001.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -33,6 +23,11 @@ function ENT:Initialize()
 end
 
 function ENT:Use(act, cal)
+    if (LaundryConfig.BlackOrWhiteList and LaundryConfig.Teams[team.GetName(cal:Team())]) or (not LaundryConfig.BlackOrWhiteList and not LaundryConfig.Teams[team.GetName(cal:Team())]) then
+        DarkRP.notify(cal, 1, 5, LaundryConfig.PhraseCantInteract)
+        return
+    end
+    
 	if self:GetClothesNumber() <= 0 then return end
 
 	local pos = self:LocalToWorld(self:OBBCenter())
@@ -42,20 +37,11 @@ function ENT:Use(act, cal)
 	if not cloth:IsValid() then return end
 	cloth:SetPos(pos + (ang:Up() * 30))
 	cloth:SetAngles(self:GetAngles())
-	if math.random(1, 4) == 4 then
-		cloth:SetClothType(2)
-	else
-		cloth:SetClothType(1)
-	end
+	cloth:SetClothType(math.random(1, 4) == 4 and 2 or 1)
 	cloth:SetClean(false)
 	cloth:Spawn()
 
 	self:SetClothesNumber(self:GetClothesNumber() - 1)
-end
-
-function ENT:Think()
-	self:NextThink(CurTime())
-	return true
 end
 
 function ENT:OnRemove()
